@@ -1,0 +1,17 @@
+{
+  "name": "vaxerban",
+  "version": "1.0.0",
+  "description": "VAXERBAN by zaax - WA Ban Report Web Tool",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "puppeteer": "^22.10.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "chalk": "^4.1.2"
+  }
+}
