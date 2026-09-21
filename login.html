@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAXERBAN — Login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 16px;
+    padding: 40px 32px;
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .logo h1 {
+    font-size: 2em;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  .logo h1 span { color: #ff2d2d; }
+  .logo p {
+    color: #666;
+    font-size: 0.8em;
+    margin-top: 6px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .field {
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.8em;
+    color: #888;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .field input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.95em;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .field input:focus {
+    border-color: #ff2d2d;
+    background: #0d0d0d;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    background: #fff;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  button:hover { background: #ff2d2d; color: #fff; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .error {
+    background: rgba(255, 45, 45, 0.1);
+    border: 1px solid rgba(255, 45, 45, 0.3);
+    color: #ff6b6b;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    color: #444;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="logo">
+      <h1>VAXER<span>BAN</span></h1>
+      <p>by zaax</p>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" autocomplete="off" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" autocomplete="off" required>
+      </div>
+      <button type="submit" id="loginBtn">Login</button>
+    </form>
+
+    <div class="footer">AUTHORIZED ACCESS ONLY</div>
+  </div>
+
+<script>
+  const form = document.getElementById('loginForm');
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Loading...';
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value
+        })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        window.location.href = '/';
+      } else {
+        err.textContent = data.error || 'Login gagal';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    } catch (e) {
+      err.textContent = 'Server error: ' + e.message;
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    }
+  });
+</script>
+</body>
+</html>
