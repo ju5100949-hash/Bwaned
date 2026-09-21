@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAXERBAN — Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .logo h1 {
+    font-size: 1.6em;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+  .logo h1 span { color: #ff2d2d; }
+  .logo p {
+    color: #555;
+    font-size: 0.7em;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .logout {
+    background: transparent;
+    border: 1px solid #262626;
+    color: #888;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .logout:hover { border-color: #ff2d2d; color: #ff2d2d; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 20px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .card h2 {
+    font-size: 0.9em;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 0.75em;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9em;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .field input:focus { border-color: #ff2d2d; }
+  .field .hint { color: #444; font-size: 0.7em; margin-top: 5px; }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .checkbox-row input { accent-color: #ff2d2d; width: 16px; height: 16px; }
+  .checkbox-row span { font-size: 0.85em; color: #ccc; }
+
+  .btn-start {
+    width: 100%;
+    padding: 14px;
+    background: #fff;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-start:hover { background: #ff2d2d; color: #fff; }
+  .btn-start:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .stat {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 1.6em;
+    font-weight: 800;
+    color: #fff;
+  }
+  .stat .num.green { color: #00ff88; }
+  .stat .num.red { color: #ff2d2d; }
+  .stat .lbl {
+    font-size: 0.7em;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .status-badge.idle { background: #1a1a1a; color: #666; }
+  .status-badge.running { background: rgba(0,255,136,0.15); color: #00ff88; }
+  .status-badge.done { background: rgba(255,45,45,0.15); color: #ff2d2d; }
+
+  .log {
+    background: #060606;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 16px;
+    height: 480px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.78em;
+    line-height: 1.7;
+  }
+  .log-entry { padding: 2px 0; color: #888; }
+  .log-entry.info { color: #6bb9ff; }
+  .log-entry.success { color: #00ff88; }
+  .log-entry.error { color: #ff4d4d; }
+  .log-entry.warn { color: #ffcc00; }
+  .log-entry .ts { color: #333; margin-right: 8px; }
+
+  .progress-bar {
+    height: 4px;
+    background: #1a1a1a;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff2d2d, #fff);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">
+      <h1>VAXER<span>BAN</span></h1>
+      <p>by zaax</p>
+    </div>
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: CONTROL -->
+    <div class="card">
+      <h2>Configuration</h2>
+
+      <div class="field">
+        <label>Target WhatsApp Number</label>
+        <input type="text" id="target" placeholder="08xxxxxxxxxx">
+        <div class="hint">Format: 08xx atau 628xx</div>
+      </div>
+
+      <div class="field">
+        <label>Report Count</label>
+        <input type="number" id="reportCount" value="10" min="1" max="500">
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>Delay Min (ms)</label>
+          <input type="number" id="delayMin" value="3000" min="500" step="500">
+        </div>
+        <div class="field">
+          <label>Delay Max (ms)</label>
+          <input type="number" id="delayMax" value="8000" min="1000" step="500">
+        </div>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="headless">
+        <span>Headless Mode (hidden browser)</span>
+      </label>
+
+      <button class="btn-start" id="startBtn" onclick="startJob()">🚀 Start Report</button>
+    </div>
+
+    <!-- RIGHT: MONITOR -->
+    <div class="card">
+      <h2>
+        Live Monitor
+        <span class="status-badge idle" id="statusBadge" style="float:right;">IDLE</span>
+      </h2>
+
+      <div class="progress-bar">
+        <div class="fill" id="progressFill"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="num" id="statCurrent">0/0</div>
+          <div class="lbl">Progress</div>
+        </div>
+        <div class="stat">
+          <div class="num green" id="statSuccess">0</div>
+          <div class="lbl">Success</div>
+        </div>
+        <div class="stat">
+          <div class="num red" id="statFailed">0</div>
+          <div class="lbl">Failed</div>
+        </div>
+      </div>
+
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const logEl = document.getElementById('log');
+  const statusBadge = document.getElementById('statusBadge');
+  const progressFill = document.getElementById('progressFill');
+  const statCurrent = document.getElementById('statCurrent');
+  const statSuccess = document.getElementById('statSuccess');
+  const statFailed = document.getElementById('statFailed');
+  const startBtn = document.getElementById('startBtn');
+
+  let currentJob = null;
+
+  // ============================================
+  // LOG STREAM (SSE)
+  // ============================================
+  const evtSource = new EventSource('/api/logs');
+  evtSource.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      addLog(data.type, data.msg, data.ts);
+    } catch (err) {}
+  };
+  evtSource.onerror = () => {
+    addLog('error', 'Log stream disconnected. Refresh page kalo perlu.');
+  };
+
+  function addLog(type, msg, ts) {
+    const time = new Date(ts || Date.now()).toLocaleTimeString('id-ID', { hour12: false });
+    const div = document.createElement('div');
+    div.className = 'log-entry ' + type;
+    div.innerHTML = `<span class="ts">${time}</span>${escapeHtml(msg)}`;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // ============================================
+  // JOB POLLING
+  // ============================================
+  async function pollJob() {
+    try {
+      const res = await fetch('/api/job');
+      if (res.status === 401) return window.location.href = '/login.html';
+      const job = await res.json();
+      currentJob = job;
+      renderJob(job);
+    } catch (e) {}
+  }
+
+  function renderJob(job) {
+    statCurrent.textContent = `${job.current}/${job.total}`;
+    statSuccess.textContent = job.success;
+    statFailed.textContent = job.failed;
+
+    const pct = job.total > 0 ? (job.current / job.total) * 100 : 0;
+    progressFill.style.width = pct + '%';
+
+    if (job.running) {
+      statusBadge.className = 'status-badge running';
+      statusBadge.textContent = 'RUNNING';
+      startBtn.disabled = true;
+      startBtn.textContent = '⏳ Running...';
+    } else if (job.total > 0) {
+      statusBadge.className = 'status-badge done';
+      statusBadge.textContent = 'DONE';
+      startBtn.disabled = false;
+      startBtn.textContent = '🚀 Start Report';
+    } else {
+      statusBadge.className = 'status-badge idle';
+      statusBadge.textContent = 'IDLE';
+      startBtn.disabled = false;
+      startBtn.textContent = '🚀 Start Report';
+    }
+  }
+
+  setInterval(pollJob, 1500);
+  pollJob();
+
+  // ============================================
+  // START JOB
+  // ============================================
+  async function startJob() {
+    const target = document.getElementById('target').value.trim();
+    if (!target) return alert('Nomor target diisi dulu boss!');
+
+    const payload = {
+      target,
+      reportCount: document.getElementById('reportCount').value,
+      delayMin: document.getElementById('delayMin').value,
+      delayMax: document.getElementById('delayMax').value,
+      headless: document.getElementById('headless').checked
+    };
+
+    startBtn.disabled = true;
+    startBtn.textContent = '⏳ Starting...';
+
+    try {
+      const res = await fetch('/api/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        alert(data.error || 'Gagal start job');
+        startBtn.disabled = false;
+        startBtn.textContent = '🚀 Start Report';
+      }
+      pollJob();
+    } catch (e) {
+      alert('Error: ' + e.message);
+      startBtn.disabled = false;
+      startBtn.textContent = '🚀 Start Report';
+    }
+  }
+
+  // ============================================
+  // LOGOUT
+  // ============================================
+  async function logout() {
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.href = '/login.html';
+  }
+</script>
+</body>
+</html>
